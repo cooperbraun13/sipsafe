@@ -1,24 +1,19 @@
-/**
- * Session Types
- * 
- * TypeScript types related to drinking sessions.
- * 
- * Types:
- * - ActiveSession: Session that is currently in progress
- * - CompletedSession: Session that has ended
- * - SessionWithDrinks: Session with all associated drinks
- */
+/*
+* Session Types
+* 
+* TypeScript types related to drinking sessions.
+*
+*/
 
 import { Session, Drink } from './database'
 
 export type ActiveSession = Session & {
-  ended_at: null
+  end_time: null
   drinks: Drink[]
 }
 
 export type CompletedSession = Session & {
-  ended_at: string
-  peak_bac: number
+  end_time: string
   drinks: Drink[]
 }
 

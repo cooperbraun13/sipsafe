@@ -1,26 +1,24 @@
-/**
- * Drink Types
- * 
- * TypeScript types related to drinks.
- * 
- * Types:
- * - DrinkInput: Input for creating a new drink
- * - PresetDrink: Predefined drink options (beer, wine, shot)
- * - DrinkWithAlcohol: Drink with calculated alcohol content
- */
+/*
+* Drink Types
+* 
+* TypeScript types related to drinks.
+*
+*/
 
-import { Drink } from './database'
+import { Drink, Beverage } from './database'
 
 export type DrinkInput = {
-  volumeOz: number
-  abvPct: number
+  type: string // Beverage type (e.g., 'beer', 'wine', 'whiskey_shot')
+  volume_oz: number
   name?: string
 }
 
 export type PresetDrink = {
   name: string
-  volumeOz: number
-  abvPct: number
+  type: string // Beverage type
+  volume_oz: number
+  volumeOz?: number // Legacy field for backward compatibility
+  abvPct?: number // Legacy field for backward compatibility
 }
 
 export type DrinkWithAlcohol = Drink & {
@@ -28,9 +26,10 @@ export type DrinkWithAlcohol = Drink & {
 }
 
 // Preset drink definitions
+// These should match Beverage types in the database
 export const PRESET_DRINKS: PresetDrink[] = [
-  { name: 'Beer', volumeOz: 12, abvPct: 5.0 },
-  { name: 'Wine', volumeOz: 5, abvPct: 12.0 },
-  { name: 'Shot', volumeOz: 1.5, abvPct: 40.0 },
+  { name: 'Beer', type: 'beer', volume_oz: 12 },
+  { name: 'Wine', type: 'wine', volume_oz: 5 },
+  { name: 'Shot', type: 'whiskey_shot', volume_oz: 1.5 },
 ]
 
