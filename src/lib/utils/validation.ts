@@ -48,10 +48,25 @@ export function validatePhone(phone: string) {
 }
 
 export function validateUsername(username: string) {
-  // Validate drink volume and ABV inputs
+  // Validate username length
   if (username.length < 4) {
     alert('Username must be at least 4 characters long.');
     return;
+  }
+  return true;
+}
+
+export function validateDrinkInput(volumeOz: number, abvPct: number) {
+  // Validate drink volume (must be positive, reasonable max)
+  if (volumeOz <= 0 || volumeOz > 100) {
+    alert('Drink volume must be between 0 and 100 ounces.');
+    return false;
+  }
+  
+  // Validate ABV percentage (0-100%)
+  if (abvPct < 0 || abvPct > 100) {
+    alert('Alcohol percentage must be between 0 and 100.');
+    return false;
   }
   return true;
 }
