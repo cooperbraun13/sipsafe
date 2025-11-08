@@ -16,6 +16,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Header from '@/components/ui/header';
 
 // TODO: Implement home page with:
 // - Check authentication (redirect to / if not logged in)
@@ -39,10 +40,13 @@ export default async function HomePage() {
   // TODO: Fetch past sessions
 
   return (
-    <div>
-      {/* TODO: Implement home page layout */}
-      <h1>Welcome to SipSafe!</h1>
-    </div>
+    <>
+      <div>
+
+        {/* TODO: Implement home page layout */}
+        
+      </div>
+    </>
   )
 }
 
