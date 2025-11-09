@@ -16,18 +16,43 @@
 
 'use client'
 
-// TODO: Implement verify code page with:
-// - Get email from query params
-// - Use VerifyCodeForm component
-// - Handle verification success
-// - Handle signup flow (create profile)
-// - Redirect to /home or /onboarding as needed
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
+import VerifyCodeForm from '@/components/auth/VerifyCodeForm'
+
+function VerifyCodeContent() {
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email') || ''
+
+  if (!email) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">No email provided</p>
+          <a href="/" className="text-blue-600 hover:underline mt-4 block">
+            Go back to login
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <VerifyCodeForm email={email} />
+    </div>
+  )
+}
 
 export default function VerifyCodePage() {
   return (
-    <div>
-      {/* TODO: Implement verify code page */}
-    </div>
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    }>
+      <VerifyCodeContent />
+    </Suspense>
   )
 }
 
