@@ -48,26 +48,38 @@ export default function VerifyCodeForm({ email, isSignup }: { email: string; isS
         if (signupDataStr) {
           const signupData = JSON.parse(signupDataStr)
           
-          // Create user record
+          // Create or update user record (upsert)
           const { error: userError } = await supabase
             .from('users')
-            .insert({ zagmail: email })
+            .upsert({ 
+              zagmail: email,
+              created_at: new Date().toISOString()
+            }, { 
+              onConflict: 'zagmail',
+              ignoreDuplicates: false 
+            })
 
-          if (userError && !userError.message.includes('duplicate')) {
-            throw new Error('Failed to create user')
+          if (userError) {
+            console.error('User creation error:', userError)
+            throw new Error('Failed to create user: ' + userError.message)
           }
 
-          // Create profile record
+          // Create or update profile record (upsert)
           const { error: profileError } = await supabase
             .from('profiles')
-            .insert({
+            .upsert({
               zagmail: email,
               weight_lbs: signupData.weight_lbs,
               height_in: signupData.height_in,
               sex: signupData.sex,
+            }, {
+              onConflict: 'zagmail'
             })
 
-          if (profileError) throw new Error('Failed to create profile')
+          if (profileError) {
+            console.error('Profile creation error:', profileError)
+            throw new Error('Failed to create profile: ' + profileError.message)
+          }
 
           // Clear signup data from session storage
           sessionStorage.removeItem('signupData')

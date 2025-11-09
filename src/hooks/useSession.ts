@@ -46,9 +46,9 @@ export function useSession() {
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-  const supabase = createClient()
 
   const fetchActiveSession = useCallback(async () => {
+    const supabase = createClient()
     try {
       setIsLoading(true)
       setError(null)
@@ -116,7 +116,7 @@ export function useSession() {
     } finally {
       setIsLoading(false)
     }
-  }, [supabase])
+  }, [])
 
   const startSession = async () => {
     try {
