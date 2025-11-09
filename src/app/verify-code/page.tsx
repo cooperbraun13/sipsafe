@@ -23,6 +23,7 @@ import VerifyCodeForm from '@/components/auth/VerifyCodeForm'
 function VerifyCodeContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
+  const isSignup = searchParams.get('signup') === 'true'
 
   if (!email) {
     return (
@@ -38,8 +39,8 @@ function VerifyCodeContent() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <VerifyCodeForm email={email} />
+    <div className="flex min-h-screen items-center justify-center bg-[#C1C6C8]">
+      <VerifyCodeForm email={email} isSignup={isSignup} />
     </div>
   )
 }

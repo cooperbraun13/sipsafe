@@ -1,11 +1,12 @@
 'use client';
 
-import LoginForm from '@/components/auth/LoginForm'
+import SignUpForm from '@/components/auth/SignUpForm'
 
-export default function Home() {
+export default function SignUpPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#C1C6C8]">
-      <LoginForm />
+      <SignUpForm />
     </div>
   );
 }
+

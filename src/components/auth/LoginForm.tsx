@@ -64,12 +64,13 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-md mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold text-center mb-6">SipSafe Login</h1>
+      <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-[#041E42]">
+        <h1 className="text-3xl font-bold text-center mb-6 text-[#041E42]">Sip Safe</h1>
+        <p className="text-center text-[#041E42] mb-8 font-medium">Login to continue</p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-semibold text-[#041E42] mb-2">
               Zagmail Address
             </label>
             <input
@@ -80,18 +81,18 @@ export default function LoginForm() {
               placeholder="your.name@zagmail.gonzaga.edu"
               required
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+              className="w-full px-4 py-2 border-2 border-[#041E42] rounded-md focus:ring-2 focus:ring-[#C41E3A] focus:border-[#C41E3A] disabled:bg-[#C1C6C8] text-[#041E42] font-medium"
             />
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+            <div className="text-white text-sm bg-[#C41E3A] p-3 rounded-md font-medium">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
+            <div className="text-[#041E42] text-sm bg-[#22bb45] p-3 rounded-md font-medium">
               Code sent! Check your email.
             </div>
           )}
@@ -99,10 +100,16 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={isLoading || !email}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-[#041E42] text-[#C1C6C8] py-3 px-4 rounded-md hover:bg-[#C41E3A] disabled:bg-[#C1C6C8] disabled:text-[#041E42] disabled:cursor-not-allowed transition-colors font-semibold text-lg"
           >
             {isLoading ? 'Sending...' : 'Send Login Code'}
           </button>
+
+          <div className="text-center mt-4">
+            <a href="/signup" className="text-[#041E42] text-sm hover:text-[#C41E3A] font-medium transition-colors">
+              Don't have an account? Sign up
+            </a>
+          </div>
         </form>
       </div>
     </div>
