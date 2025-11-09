@@ -40,10 +40,14 @@ export default function LoginForm() {
     }
 
     try {
+      // Get the current origin for the redirect URL
+      const origin = window.location.origin
+      
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
           shouldCreateUser: true,
+          emailRedirectTo: `${origin}/auth/callback`, // Magic link will redirect here
         }
       })
 

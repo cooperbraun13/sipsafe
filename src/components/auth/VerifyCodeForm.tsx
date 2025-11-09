@@ -53,10 +53,13 @@ export default function VerifyCodeForm({ email }: { email: string }) {
   const handleResend = async () => {
     setError('')
     try {
+      const origin = window.location.origin
+      
       const { error: resendError } = await supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true,
+          emailRedirectTo: `${origin}/auth/callback`, // Magic link will redirect here
         }
       })
 
@@ -86,12 +89,12 @@ export default function VerifyCodeForm({ email }: { email: string }) {
               id="code"
               type="text"
               value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="000000"
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+              placeholder="00000000"
               required
               disabled={isLoading}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest disabled:bg-gray-100"
-              maxLength={6}
+              maxLength={8}
             />
           </div>
 
@@ -103,7 +106,7 @@ export default function VerifyCodeForm({ email }: { email: string }) {
 
           <button
             type="submit"
-            disabled={isLoading || code.length !== 6}
+            disabled={isLoading || code.length !== 8}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? 'Verifying...' : 'Verify Code'}
