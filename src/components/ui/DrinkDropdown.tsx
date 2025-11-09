@@ -1,4 +1,3 @@
-// DrinkDropdown.js
 interface DrinkDropdownProps {
     value: string;
     onChange: (value: string) => void;

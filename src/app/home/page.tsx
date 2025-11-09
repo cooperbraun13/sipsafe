@@ -1,52 +1,24 @@
-/**
- * Home Page (Protected)
- * 
- * Main dashboard page after login.
- * 
- * Features:
- * - Protected route (requires authentication)
- * - Shows active session if exists
- * - Option to start new session
- * - List of past sessions
- * - Resources panel (always visible)
- * - User profile info
- * 
- * Route: /home
- */
+'use client';
+import Header from '@/components/ui/header'
+import Footer from '@/components/ui/Footer'
+import DrunkBar from '@/components/ui/DrunkBar'
+import LogDrinkButton from '@/components/ui/LogDrinkButton'
+import DrinkLog from '@/components/ui/DrinkLog'
 
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import Header from '@/components/ui/header';
-
-// TODO: Implement home page with:
-// - Check authentication (redirect to / if not logged in)
-// - Check if profile exists (redirect to /onboarding if not)
-// - Fetch active session
-// - Display active session or "Start Session" button
-// - List past sessions
-// - Include ResourcesPanel component
-// - Include EmergencyButton component
-
-export default async function HomePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/')
-  }
-
-  // TODO: Check if profile exists
-  // TODO: Fetch active session
-  // TODO: Fetch past sessions
-
+export default function HomePage() {
   return (
     <>
-      <div>
-
-        {/* TODO: Implement home page layout */}
-        
-      </div>
+    <Header/>
+    <DrunkBar />
+    <DrinkLog />
+    {/* <LogDrinkButton onClick={() => console.log("clicked")}> Log Drinks</Button> */}
+    <div className="flex min-h-screen items-center justify-center">
+      <main className="flex flex-col items-center gap-4">
+      
+      </main>
+    </div>
+    <Footer/>
     </>
-  )
+  );
 }
 
