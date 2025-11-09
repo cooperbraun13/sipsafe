@@ -21,7 +21,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function VerifyCodeForm({ email }: { email: string }) {
+export default function VerifyCodeForm({ email, isSignup }: { email: string; isSignup?: boolean }) {
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -41,6 +41,38 @@ export default function VerifyCodeForm({ email }: { email: string }) {
       })
 
       if (verifyError) throw verifyError
+
+      // If this is a signup, create the user profile
+      if (isSignup) {
+        const signupDataStr = sessionStorage.getItem('signupData')
+        if (signupDataStr) {
+          const signupData = JSON.parse(signupDataStr)
+          
+          // Create user record
+          const { error: userError } = await supabase
+            .from('users')
+            .insert({ zagmail: email })
+
+          if (userError && !userError.message.includes('duplicate')) {
+            throw new Error('Failed to create user')
+          }
+
+          // Create profile record
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              zagmail: email,
+              weight_lbs: signupData.weight_lbs,
+              height_in: signupData.height_in,
+              sex: signupData.sex,
+            })
+
+          if (profileError) throw new Error('Failed to create profile')
+
+          // Clear signup data from session storage
+          sessionStorage.removeItem('signupData')
+        }
+      }
 
       // Successfully verified, redirect to home
       router.push('/home')
@@ -73,16 +105,16 @@ export default function VerifyCodeForm({ email }: { email: string }) {
 
   return (
     <div className="w-full max-w-md mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold text-center mb-2">Verify Your Email</h1>
-        <p className="text-gray-600 text-center mb-6">
+      <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-[#041E42]">
+        <h1 className="text-3xl font-bold text-center mb-2 text-[#041E42]">Verify Your Email</h1>
+        <p className="text-[#041E42] text-center mb-6 font-medium">
           Enter the code sent to<br />
-          <span className="font-medium">{email}</span>
+          <span className="font-bold">{email}</span>
         </p>
         
         <form onSubmit={handleVerify} className="space-y-4">
           <div>
-            <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="code" className="block text-sm font-semibold text-[#041E42] mb-2">
               Verification Code
             </label>
             <input
@@ -93,13 +125,13 @@ export default function VerifyCodeForm({ email }: { email: string }) {
               placeholder="00000000"
               required
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest disabled:bg-gray-100"
+              className="w-full px-4 py-3 border-2 border-[#041E42] rounded-md focus:ring-2 focus:ring-[#C41E3A] focus:border-[#C41E3A] text-center text-2xl tracking-widest disabled:bg-[#C1C6C8] text-[#041E42] font-bold"
               maxLength={8}
             />
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+            <div className="text-white text-sm bg-[#C41E3A] p-3 rounded-md font-medium">
               {error}
             </div>
           )}
@@ -107,7 +139,7 @@ export default function VerifyCodeForm({ email }: { email: string }) {
           <button
             type="submit"
             disabled={isLoading || code.length !== 8}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-[#041E42] text-[#C1C6C8] py-3 px-4 rounded-md hover:bg-[#C41E3A] disabled:bg-[#C1C6C8] disabled:text-[#041E42] disabled:cursor-not-allowed transition-colors font-semibold text-lg"
           >
             {isLoading ? 'Verifying...' : 'Verify Code'}
           </button>
@@ -116,7 +148,7 @@ export default function VerifyCodeForm({ email }: { email: string }) {
             type="button"
             onClick={handleResend}
             disabled={isLoading}
-            className="w-full text-blue-600 text-sm hover:underline"
+            className="w-full text-[#041E42] text-sm hover:text-[#C41E3A] font-medium transition-colors"
           >
             Resend code
           </button>

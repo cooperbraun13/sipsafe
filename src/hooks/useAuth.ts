@@ -12,6 +12,7 @@
  * Returns:
  *   {
  *     user: User | null
+ *     profile: Profile | null
  *     isLoading: boolean
  *     isAuthenticated: boolean
  *     signOut: () => Promise<void>
@@ -20,21 +21,79 @@
 
 'use client'
 
-// TODO: Implement useAuth hook with:
-// - Get current user from Supabase
-// - Check if user is authenticated
-// - Sign out function
-// - Loading state
-// - Use Supabase client
-// - Handle auth state changes
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
+import type { Profile } from '@/types/database'
 
 export function useAuth() {
-  // TODO: Implement hook
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const supabase = createClient()
+  const router = useRouter()
+
+  useEffect(() => {
+    // Get initial session
+    const getUser = async () => {
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+        setUser(currentUser)
+
+        if (currentUser?.email) {
+          // Fetch user profile
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('zagmail', currentUser.email)
+            .single()
+
+          setProfile(profileData)
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    getUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setUser(session?.user ?? null)
+      
+      if (session?.user?.email) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('zagmail', session.user.email)
+          .single()
+
+        setProfile(profileData)
+      } else {
+        setProfile(null)
+      }
+      
+      setIsLoading(false)
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase])
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+  }
+
   return {
-    user: null,
-    isLoading: false,
-    isAuthenticated: false,
-    signOut: async () => {},
+    user,
+    profile,
+    isLoading,
+    isAuthenticated: !!user,
+    signOut,
   }
 }
-

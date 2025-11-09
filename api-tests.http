@@ -1,0 +1,78 @@
+###
+# SipSafe API Tests
+# Use with VS Code REST Client extension or import to Postman
+###
+
+### Variables
+@baseUrl = http://localhost:3001
+@sessionId = 1
+
+### 1. Start a Session
+# POST /api/session/start
+# Creates a new drinking session (or returns existing active session)
+POST {{baseUrl}}/api/session/start
+Content-Type: application/json
+
+###
+
+### 2. Get Session by ID
+# GET /api/session/[id]
+# Retrieves session details with all drinks
+GET {{baseUrl}}/api/session/{{sessionId}}
+
+###
+
+### 3. End Session
+# POST /api/session/end
+# Ends the current active session
+POST {{baseUrl}}/api/session/end
+Content-Type: application/json
+
+###
+
+### 4. Log a Drink (Beer)
+# POST /api/drink
+# Adds a drink to the active session
+# Note: volumeOz is camelCase, duration is ISO interval format
+POST {{baseUrl}}/api/drink
+Content-Type: application/json
+
+{
+  "type": "beer",
+  "volumeOz": 12,
+  "duration": "30 minutes"
+}
+
+###
+
+### 5. Log a Wine Drink
+POST {{baseUrl}}/api/drink
+Content-Type: application/json
+
+{
+  "type": "wine",
+  "volumeOz": 8,
+  "duration": "45 minutes"
+}
+
+###
+
+### 6. Log a Shot
+POST {{baseUrl}}/api/drink
+Content-Type: application/json
+
+{
+  "type": "whiskey_shot",
+  "volumeOz": 1.5,
+  "duration": "5 minutes"
+}
+
+###
+
+### 7. Get Resources
+# GET /api/resources
+# Returns safety resources
+GET {{baseUrl}}/api/resources
+
+###
+
