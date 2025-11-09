@@ -14,7 +14,7 @@ export type UserProfile = User & {
 export type ProfileInput = {
   weight_lbs: number
   height_in: number
-  gender: 'female' | 'male'
+  sex: 'female' | 'male'
   emergency_phone?: string
 }
 

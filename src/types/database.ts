@@ -14,16 +14,15 @@ export type Profile = {
   zagmail: string; // FK -> User
   weight_lbs: number;
   height_in: number;
-  gender: 'female'|'male';
+  sex: 'female'|'male';
   emergency_phone?: string | null;
 };
 
 export type Session = {
-  session_id: string;
+  session_id: number; // SERIAL (auto-incrementing integer)
   zagmail: string; // FK -> User
   start_time: string;
   end_time?: string | null;
-  last_drink_at?: string | null; // optional; can compute from Drinks
   bac: number;
 };
 
@@ -33,9 +32,9 @@ export type Beverage = {
 };
 
 export type Drink = {
-  drink_id: string; // uuid string (keeps rows distinct)
-  session_id: string; // FK -> Session
-  type: string; // FK -> Beverage.type (keeps it simple—no numeric IDs)
+  session_id: number; // FK -> Session (part of composite PK)
+  type: string; // FK -> Beverage.type (part of composite PK)
+  time: string; // TIMESTAMPTZ (part of composite PK)
   volume_oz: number; // e.g., 12.0
-  consumed_at: string;
+  duration: string; // INTERVAL (e.g., '2 hours', '30 minutes')
 };

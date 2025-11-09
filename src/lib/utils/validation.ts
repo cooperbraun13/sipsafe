@@ -38,7 +38,7 @@ export function validateHeight(height: number) {
   return true;
 }
 
-export function validatePhone(phone: string) {
+export function validateEmergencyPhone(phone: string) {
   // Validate phone number format
   if (!phone.match(/^\d{10}$/)) {
     alert('Phone number must be 10 digits.');
@@ -55,19 +55,3 @@ export function validateUsername(username: string) {
   }
   return true;
 }
-
-export function validateDrinkInput(volumeOz: number, abvPct: number) {
-  // Validate drink volume (must be positive, reasonable max)
-  if (volumeOz <= 0 || volumeOz > 100) {
-    alert('Drink volume must be between 0 and 100 ounces.');
-    return false;
-  }
-  
-  // Validate ABV percentage (0-100%)
-  if (abvPct < 0 || abvPct > 100) {
-    alert('Alcohol percentage must be between 0 and 100.');
-    return false;
-  }
-  return true;
-}
-

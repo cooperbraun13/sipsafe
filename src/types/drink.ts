@@ -9,8 +9,9 @@ import { Drink, Beverage } from './database'
 
 export type DrinkInput = {
   type: string // Beverage type (e.g., 'beer', 'wine', 'whiskey_shot')
-  volume_oz: number
-  name?: string
+  volumeOz: number // Volume in ounces
+  time?: string // Optional timestamp (defaults to now)
+  duration?: string // Optional duration as ISO interval (e.g., '2 hours', defaults to '0 hours')
 }
 
 export type PresetDrink = {
