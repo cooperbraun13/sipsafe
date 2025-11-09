@@ -43,13 +43,24 @@ export function useAuth() {
         setUser(currentUser)
 
         if (currentUser?.email) {
-          // Fetch user profile
-          const { data: profileData } = await supabase
+          // Fetch user profile with timeout
+          const profilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('zagmail', currentUser.email)
             .single()
+          
+          const result = await Promise.race([
+            profilePromise,
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Profile fetch timeout')), 3000)
+            )
+          ]).catch(err => {
+            console.warn('Profile fetch slow, continuing anyway...')
+            return { data: null, error: null }
+          })
 
+          const { data: profileData } = result as any
           setProfile(profileData)
         }
       } catch (error) {
@@ -66,12 +77,23 @@ export function useAuth() {
       setUser(session?.user ?? null)
       
       if (session?.user?.email) {
-        const { data: profileData } = await supabase
+        const profilePromise = supabase
           .from('profiles')
           .select('*')
           .eq('zagmail', session.user.email)
           .single()
+        
+        const result = await Promise.race([
+          profilePromise,
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Profile fetch timeout')), 3000)
+          )
+        ]).catch(err => {
+          console.warn('Profile fetch slow, continuing anyway...')
+          return { data: null, error: null }
+        })
 
+        const { data: profileData } = result as any
         setProfile(profileData)
       } else {
         setProfile(null)

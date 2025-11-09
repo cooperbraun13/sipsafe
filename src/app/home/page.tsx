@@ -12,7 +12,7 @@ import { useBAC } from '@/hooks/useBAC'
 export default function HomePage() {
   const router = useRouter()
   const { user, profile, isLoading: authLoading, isAuthenticated } = useAuth()
-  const { activeSession, isLoading: sessionLoading, startSession, endSession, error: sessionError } = useSession()
+  const { activeSession, isLoading: sessionLoading, startSession, endSession, refreshSession, error: sessionError } = useSession()
   const { currentBAC, timeToSober, bacRange } = useBAC(
     activeSession?.drinks || [],
     profile,
@@ -23,6 +23,17 @@ export default function HomePage() {
   useEffect(() => {
     console.log('Debug:', { authLoading, sessionLoading, isAuthenticated, user: user?.email, profile, activeSession })
   }, [authLoading, sessionLoading, isAuthenticated, user, profile, activeSession])
+
+  // Auto-refresh disabled - use the manual Refresh button instead
+  // This prevents the loading screen from blocking the UI
+  // useEffect(() => {
+  //   if (!activeSession) return
+  //   const interval = setInterval(() => {
+  //     console.log('Auto-refreshing session...')
+  //     refreshSession()
+  //   }, 60000) // 60 seconds
+  //   return () => clearInterval(interval)
+  // }, [activeSession, refreshSession])
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -81,12 +92,20 @@ export default function HomePage() {
                   Started: {new Date(activeSession.started_at).toLocaleString()}
                 </p>
               </div>
-              <button
-                onClick={endSession}
-                className="bg-[#C41E3A] text-white px-4 py-2 rounded-md hover:bg-red-700 font-semibold"
-              >
-                End Session
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={refreshSession}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 font-semibold"
+                >
+                  Refresh
+                </button>
+                <button
+                  onClick={endSession}
+                  className="bg-[#C41E3A] text-white px-4 py-2 rounded-md hover:bg-red-700 font-semibold"
+                >
+                  End Session
+                </button>
+              </div>
             </div>
 
             {/* BAC Display */}

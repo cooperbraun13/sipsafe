@@ -23,7 +23,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
 type Drink = {
   session_id: number
@@ -45,78 +44,56 @@ type ActiveSession = {
 export function useSession() {
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  const fetchActiveSession = useCallback(async () => {
-    const supabase = createClient()
+  const fetchActiveSession = useCallback(async (skipLoadingState = false) => {
     try {
-      setIsLoading(true)
+      // Only set loading state on initial load, not refreshes
+      if (!skipLoadingState) {
+        setIsLoading(true)
+      }
       setError(null)
 
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user?.email) {
-        setActiveSession(null)
-        return
-      }
+      console.log('Fetching active session via API...')
 
-      // Fetch active session from database
-      const { data: session, error: sessionError } = await supabase
-        .from('sessions')
-        .select('session_id, start_time, end_time, bac')
-        .eq('zagmail', user.email)
-        .is('end_time', null)
-        .order('start_time', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (sessionError) throw sessionError
-
-      if (!session) {
-        setActiveSession(null)
-        return
-      }
-
-      // Fetch drinks for this session
-      const { data: drinks, error: drinksError } = await supabase
-        .from('drinks')
-        .select('session_id, type, time, volume_oz, duration')
-        .eq('session_id', session.session_id)
-        .order('time', { ascending: true })
-
-      if (drinksError) throw drinksError
-
-      // Fetch beverage info
-      let drinksWithAbv = drinks || []
-      if (drinks && drinks.length > 0) {
-        const beverageTypes = [...new Set(drinks.map(d => d.type))]
-        const { data: beverages } = await supabase
-          .from('beverages')
-          .select('type, alc_pct')
-          .in('type', beverageTypes)
-
-        if (beverages) {
-          const beverageMap = new Map(beverages.map(b => [b.type, b.alc_pct]))
-          drinksWithAbv = drinks.map(drink => ({
-            ...drink,
-            abv_pct: (beverageMap.get(drink.type) || 0) * 100,
-          }))
-        }
-      }
-
-      setActiveSession({
-        id: session.session_id,
-        started_at: session.start_time,
-        ended_at: session.end_time,
-        peak_bac: session.bac,
-        drinks: drinksWithAbv,
+      // Use API route instead of direct Supabase query
+      const response = await fetch('/api/session/active', {
+        method: 'GET',
+        credentials: 'include', // Include cookies for auth
       })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log('No active session found')
+          setActiveSession(null)
+          setIsLoading(false)
+          if (isInitialLoad) setIsInitialLoad(false)
+          return
+        }
+        throw new Error('Failed to fetch session')
+      }
+
+      const sessionData = await response.json()
+      console.log('Got session data:', sessionData)
+      
+      setActiveSession(sessionData)
+      
+      if (isInitialLoad) {
+        setIsInitialLoad(false)
+      }
+      setIsLoading(false)
+      console.log('Session fetch completed successfully')
     } catch (err) {
+      console.error('fetchActiveSession error:', err)
       setError(err instanceof Error ? err : new Error('Failed to fetch session'))
       setActiveSession(null)
-    } finally {
+      if (isInitialLoad) {
+        setIsInitialLoad(false)
+      }
       setIsLoading(false)
     }
-  }, [])
+  }, [isInitialLoad])
 
   const startSession = async () => {
     try {
@@ -154,9 +131,10 @@ export function useSession() {
     }
   }
 
-  const refreshSession = async () => {
-    await fetchActiveSession()
-  }
+  const refreshSession = useCallback(async () => {
+    // Pass true to skip showing loading state during refresh
+    await fetchActiveSession(true)
+  }, [fetchActiveSession])
 
   useEffect(() => {
     fetchActiveSession()
