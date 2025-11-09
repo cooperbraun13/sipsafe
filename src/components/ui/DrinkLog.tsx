@@ -4,10 +4,16 @@ import NumDrinkDropdown from './NumDrinkDropdown';
 import SizeDropdown from './SizeDropdown';
 import DurationDropdown from './DurationDropdown';
 
-export default function DrinkLog(){
+interface DrinkLogProps {
+    onDrinkAdded?: () => void;
+}
+
+export default function DrinkLog({ onDrinkAdded }: DrinkLogProps){
     const [drinks, setDrinks] = useState([
         { id: 1, quantity: '', type: '', size: '', duration: '' }
     ]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     const updateDrinkType = (id: number, newType: string) => {
         setDrinks(drinks.map(drink => 
@@ -29,11 +35,69 @@ export default function DrinkLog(){
 
     const updateDrinkDuration = (id: number, newDuration: string) => {
         setDrinks(drinks.map(drink =>
-            drink.id === id ? { ...drink, duration: newDuration } : drink // Fixed: was updating quantity instead of duration
+            drink.id === id ? { ...drink, duration: newDuration } : drink
         ));
     }
 
-    const addNewDrink = () => {
+    const submitDrinks = async () => {
+        setError('');
+        setIsSubmitting(true);
+
+        try {
+            // Validate all drinks have complete data
+            const incompleteDrinks = drinks.filter(d => !d.quantity || !d.type || !d.size || !d.duration);
+            if (incompleteDrinks.length > 0) {
+                setError('Please fill in all fields for each drink');
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Submit each drink to the API
+            for (const drink of drinks) {
+                const quantity = parseInt(drink.quantity);
+                
+                // Map drink type to API format
+                let apiType = drink.type;
+                if (drink.type === 'vodka') {
+                    apiType = 'whiskey_shot'; // Map vodka to whiskey_shot
+                }
+
+                // Convert duration from hours to minutes format
+                const durationHours = parseFloat(drink.duration);
+                const durationMinutes = Math.round(durationHours * 60);
+                const durationString = `${durationMinutes} minutes`;
+
+                // Submit this drink 'quantity' times
+                for (let i = 0; i < quantity; i++) {
+                    const response = await fetch('/api/drink', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: apiType,
+                            volumeOz: parseFloat(drink.size),
+                            duration: durationString
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to log drink');
+                    }
+                }
+            }
+
+            // Success! Reset form and notify parent
+            setDrinks([{ id: Date.now(), quantity: '', type: '', size: '', duration: '' }]);
+            if (onDrinkAdded) {
+                onDrinkAdded(); // Trigger session refresh
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to submit drinks');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    const addNewRow = () => {
         const newDrink = {
             id: Date.now(), 
             quantity: '',
@@ -75,12 +139,29 @@ export default function DrinkLog(){
                     </li>
                 ))}
             </ul>
-            <button 
-                onClick={addNewDrink}
-                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-                Add Drink
-            </button>
+
+            {error && (
+                <div className="mt-4 text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                    {error}
+                </div>
+            )}
+
+            <div className="flex gap-3 mt-4">
+                <button 
+                    onClick={addNewRow}
+                    className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-300"
+                    disabled={isSubmitting}
+                >
+                    + Add Row
+                </button>
+                <button 
+                    onClick={submitDrinks}
+                    disabled={isSubmitting}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                    {isSubmitting ? 'Submitting...' : 'Add Drink'}
+                </button>
+            </div>
         </div>
     )
 }

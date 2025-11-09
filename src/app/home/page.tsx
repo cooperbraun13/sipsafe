@@ -131,7 +131,7 @@ export default function HomePage() {
           </div>
 
           <DrunkBar />
-          <DrinkLog />
+          <DrinkLog onDrinkAdded={refreshSession} />
         </>
       )}
       
