@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import DrinkDropdown from './DrinkDropdown';
+import NumDrinkDropdown from './NumDrinkDropdown';
 
 export default function DrinkLog(){
     const [drinks, setDrinks] = useState([
-        { id: 1, quantity: 1, type: '', size: 'medium', duration: '30' }
+        { id: 1, quantity: '', type: '', size: 'medium', duration: '30' }
     ]);
 
     const updateDrinkType = (id: number, newType: string) => {
         setDrinks(drinks.map(drink => 
             drink.id === id ? { ...drink, type: newType } : drink
+        ));
+    };
+
+    const updateDrinkQuantity = (id: number, newQuantity: string) => {
+        setDrinks(drinks.map(drink => 
+            drink.id === id ? { ...drink, quantity: newQuantity } : drink
         ));
     };
 
@@ -24,9 +31,10 @@ export default function DrinkLog(){
             <ul className="flex flex-col w-full mt-4">
                 {drinks.map((drink) => (
                     <li key={drink.id} className="flex flex-row justify-center items-center gap-[16vw] py-2 border-b">
-                        <span>1</span>
-                        
-                        {/* Using the DrinkDropdown component */}
+                        <NumDrinkDropdown
+                            value={drink.quantity}
+                            onChange={(newValue) => updateDrinkQuantity(drink.id, newValue)}
+                        />
                         <DrinkDropdown 
                             value={drink.type}
                             onChange={(newValue) => updateDrinkType(drink.id, newValue)}
