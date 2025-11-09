@@ -1,6 +1,6 @@
 export default function DrunkBar() {
   return (
-    <div className="flex justify-center items-center h-[15vh]">
+    <div className=" m-14 flex justify-center items-center h-[15vh]">
       <div className="flex flex-row w-[75vw] h-[6vh]">
         <div className="flex-1 bg-[#22bb45] flex justify-center items-center text-3xl rounded-tl-md rounded-bl-md">
           😊
