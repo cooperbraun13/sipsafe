@@ -112,7 +112,7 @@ export default function HomePage() {
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-gray-50 p-4 rounded-lg text-center">
                 <p className="text-sm text-gray-600 mb-1">Current BAC</p>
-                <p className="text-2xl font-bold text-[#041E42]">{(currentBAC * 100).toFixed(3)}%</p>
+                <p className="text-2xl font-bold text-[#041E42]">{currentBAC.toFixed(3)}%</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-center">
                 <p className="text-sm text-gray-600 mb-1">Time to Sober</p>
